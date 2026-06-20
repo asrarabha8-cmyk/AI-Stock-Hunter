@@ -19,19 +19,17 @@ symbols = [
 ]
 
 
-def scan_market():
+
+            def scan_market():
 
     results = []
 
     for symbol in symbols:
 
         try:
-            data = yf.download(
-                symbol,
+            data = yf.Ticker(symbol).history(
                 period="1mo",
-                interval="1d",
-                progress=False,
-                auto_adjust=True
+                interval="1d"
             )
 
             if data.empty:
@@ -77,7 +75,23 @@ def scan_market():
             ])
 
         except Exception as e:
-            print(symbol, e)
+            st.write("Error:", symbol, e)
+
+    df = pd.DataFrame(
+        results,
+        columns=[
+            "Symbol",
+            "Price",
+            "% Change",
+            "Volume x",
+            "AI Score"
+        ]
+    )
+
+    return df.sort_values(
+        "AI Score",
+        ascending=False
+    )
 
 
     df = pd.DataFrame(
