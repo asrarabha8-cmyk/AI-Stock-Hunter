@@ -36,13 +36,16 @@ def scan_market():
 
         try:
 
-            data = yf.download(
-                symbol,
-                period="3mo",
-                interval="1d",
-                progress=False,
-                auto_adjust=True
-            )
+            data = data = yf.download(
+    symbol,
+    period="1mo",
+    interval="1d",
+    progress=False,
+    auto_adjust=True
+)
+
+if data.empty:
+    continue
 
             if len(data)<20:
                 continue
@@ -101,7 +104,8 @@ def scan_market():
             ])
 
         except:
-            pass
+            except Exception as e:
+    st.write(symbol, e)
 
 
     df=pd.DataFrame(
