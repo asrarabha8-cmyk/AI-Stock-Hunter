@@ -3,7 +3,6 @@ import pandas as pd
 import yfinance as yf
 import time
 
-# إعداد الصفحة
 st.set_page_config(
     page_title="AI Stock Hunter",
     page_icon="🚀",
@@ -11,14 +10,6 @@ st.set_page_config(
 )
 
 st.title("🚀 AI Stock Hunter Dashboard")
-
-# تحديث تلقائي
-refresh = st.sidebar.slider(
-    "Refresh (seconds)",
-    30,
-    300,
-    60
-)
 
 symbols = [
     "ASTS","PL","RKLB","IONQ","SOUN",
@@ -30,85 +21,66 @@ symbols = [
 
 def scan_market():
 
-    results=[]
+    results = []
 
     for symbol in symbols:
 
         try:
+            data = yf.download(
+                symbol,
+                period="1mo",
+                interval="1d",
+                progress=False,
+                auto_adjust=True
+            )
 
-            data = data = yf.download(
-    symbol,
-    period="1mo",
-    interval="1d",
-    progress=False,
-    auto_adjust=True
-)
-
-if data.empty:
-    continue
-
-            if len(data)<20:
+            if data.empty:
                 continue
 
+            close = float(data["Close"].iloc[-1])
+            previous = float(data["Close"].iloc[-2])
 
-            price=float(data["Close"].iloc[-1])
-            prev=float(data["Close"].iloc[-2])
+            change = ((close / previous) - 1) * 100
 
-            change=((price/prev)-1)*100
+            volume = float(data["Volume"].iloc[-1])
+            avg_volume = float(data["Volume"].tail(20).mean())
 
+            volume_x = volume / avg_volume if avg_volume else 0
 
-            volume=float(data["Volume"].iloc[-1])
-            avg_volume=float(
-                data["Volume"].tail(20).mean()
-            )
+            ma20 = float(data["Close"].tail(20).mean())
 
-            volume_x=volume/avg_volume
+            score = 0
 
+            if volume_x >= 5:
+                score += 40
+            elif volume_x >= 3:
+                score += 30
+            elif volume_x >= 2:
+                score += 20
 
-            score=0
+            if change >= 10:
+                score += 30
+            elif change >= 5:
+                score += 20
+            elif change > 0:
+                score += 10
 
-
-            # Volume
-            if volume_x>5:
-                score+=40
-            elif volume_x>3:
-                score+=30
-            elif volume_x>2:
-                score+=20
-
-
-            # Momentum
-            if change>10:
-                score+=30
-            elif change>5:
-                score+=20
-            elif change>0:
-                score+=10
-
-
-            # Trend
-            ma20=float(
-                data["Close"].tail(20).mean()
-            )
-
-            if price>ma20:
-                score+=20
-
+            if close > ma20:
+                score += 20
 
             results.append([
                 symbol,
-                round(price,2),
+                round(close,2),
                 round(change,2),
                 round(volume_x,2),
                 score
             ])
 
-        except:
-            except Exception as e:
-    st.write(symbol, e)
+        except Exception as e:
+            print(symbol, e)
 
 
-    df=pd.DataFrame(
+    df = pd.DataFrame(
         results,
         columns=[
             "Symbol",
@@ -119,31 +91,25 @@ if data.empty:
         ]
     )
 
-
     return df.sort_values(
         "AI Score",
         ascending=False
     )
 
 
-# عرض البيانات
-
-df=scan_market()
-
+df = scan_market()
 
 st.subheader("🔥 Top Momentum Stocks")
 
-st.dataframe(
-    df,
-    use_container_width=True
-)
+if df.empty:
+    st.warning("No data received from Yahoo Finance")
+else:
+    st.dataframe(
+        df,
+        use_container_width=True
+    )
 
 
 st.caption(
-    f"Last update: {time.strftime('%H:%M:%S')}"
+    "Updated: " + time.strftime("%H:%M:%S")
 )
-
-
-# تحديث تلقائي
-time.sleep(refresh)
-st.rerun()
