@@ -33,24 +33,8 @@ refresh_button = st.sidebar.button("🔄 Refresh")
 st.title("🚀 AI Stock Hunter Pro")
 # تحديث تلقائي كل دقيقة
 st_autorefresh(interval=60000, key="refresh")
-symbols = [
-    # AI
-    "NVDA","AMD","SMCI","ARM","AVGO",
-    "PLTR","CRWD","SNOW","DDOG","NET",
-    # Space
-    "ASTS","RKLB","PL","LUNR","RDW",
-    # Quantum
-    "IONQ","RGTI","QBTS",
-    # Bitcoin
-    "MSTR","COIN","MARA","RIOT","CLSK",
-    # Growth
-    "HIMS","SOFI","HOOD","UPST",
-    "RIVN","LCID","AFRM",
-    # Biotech / AI Health
-    "TEM","RXRX",
-    # Software
-    "PATH","U","DUOL"
-]
+from symbols import SYMBOLS
+symbols = SYMBOLS
 @st.cache_data(ttl=300)
 def scan_market():
     results = []
