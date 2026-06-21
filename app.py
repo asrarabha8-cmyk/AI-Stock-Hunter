@@ -104,28 +104,28 @@ def scan_market():
             )
             # Hidden Value Bonus
 
-if revenue_growth > 30:
-    final_score += 10
+               if revenue_growth > 30:
+                   final_score += 10
 
-if revenue_growth > 50:
-    final_score += 10
+               if revenue_growth > 50:
+                   final_score += 10
 
-if ps < 10 and revenue_growth > 20:
-    final_score += 10
+               if ps < 10 and revenue_growth > 20:
+                   final_score += 10
 
-if volume_x > 2:
-    final_score += 10
-            if final_score >= 75:
-                signal = "🚀 STRONG"
-            elif final_score >= 50:
-                signal = "👀 WATCH"
-            else:
-                signal = "⏳ WAIT"
-            hidden_gem = (
-                revenue_growth > 20
-                and final_score > 60
-                and volume_x > 2
-                and final_score > 60
+               if volume_x > 2:
+                   final_score += 10
+               if final_score >= 75:
+                   signal = "🚀 STRONG"
+               elif final_score >= 50:
+                   signal = "👀 WATCH"
+               else:
+                   signal = "⏳ WAIT"
+                   hidden_gem = (
+                   revenue_growth > 20
+                   and final_score > 60
+                   and volume_x > 2
+                   and final_score > 60
             )
             results.append([
                 symbol,
