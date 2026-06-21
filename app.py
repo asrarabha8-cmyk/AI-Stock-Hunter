@@ -107,8 +107,8 @@ def scan_market():
                 signal = "🚀 STRONG"
              elif final_score >= 50:
              signal = "👀 WATCH"
-else:
-    signal = "⌛ WAIT"
+            else:
+             signal = "⌛ WAIT"
 
 hidden_gem = (
     revenue_growth > 20
