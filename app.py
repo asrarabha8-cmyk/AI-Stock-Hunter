@@ -104,9 +104,9 @@ def scan_market():
             )
             
                if final_score >= 75:
-    signal = "🚀 STRONG"
-elif final_score >= 50:
-    signal = "👀 WATCH"
+                signal = "🚀 STRONG"
+             elif final_score >= 50:
+             signal = "👀 WATCH"
 else:
     signal = "⌛ WAIT"
 
