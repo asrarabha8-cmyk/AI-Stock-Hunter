@@ -4,17 +4,51 @@ import yfinance as yf
 import time
 from fundamentals import get_fundamentals
 st.set_page_config(
-    page_title="AI Stock Hunter",
+    page_title="AI Stock Hunter Pro",
     page_icon="🚀",
     layout="wide"
 )
-st.title("🚀 AI Stock Hunter Dashboard")
+# =======================
+# Sidebar
+# =======================
+st.sidebar.title("⚙️ AI Hunter Filters")
+min_score = st.sidebar.slider(
+    "Minimum AI Score",
+    0,
+    100,
+    50
+)
+search_symbol = st.sidebar.text_input(
+    "Search Symbol",
+    ""
+).upper()
+only_hidden_gems = st.sidebar.checkbox(
+    "🚀 Market Has Not Priced It Yet"
+)
+refresh_button = st.sidebar.button("🔄 Refresh")
+# =======================
+# Title
+# =======================
+st.title("🚀 AI Stock Hunter Pro")
 symbols = [
-    "ASTS","PL","RKLB","IONQ",
-    "SOUN","HIMS","MSTR",
-    "AMD","NVDA","SMCI",
-    "PLTR","COIN","RIVN"
+    # AI
+    "NVDA","AMD","SMCI","ARM","AVGO",
+    "PLTR","CRWD","SNOW","DDOG","NET",
+    # Space
+    "ASTS","RKLB","PL","LUNR","RDW",
+    # Quantum
+    "IONQ","RGTI","QBTS",
+    # Bitcoin
+    "MSTR","COIN","MARA","RIOT","CLSK",
+    # Growth
+    "HIMS","SOFI","HOOD","UPST",
+    "RIVN","LCID","AFRM",
+    # Biotech / AI Health
+    "TEM","RXRX",
+    # Software
+    "PATH","U","DUOL"
 ]
+@st.cache_data(ttl=300)
 def scan_market():
     results = []
     for symbol in symbols:
@@ -24,58 +58,89 @@ def scan_market():
             )
             if data.empty:
                 continue
+            stock = yf.Ticker(symbol)
+            info = stock.info
             price = float(data["Close"].iloc[-1])
             old = float(data["Close"].iloc[-2])
             change = ((price / old) - 1) * 100
             volume = float(data["Volume"].iloc[-1])
-            avg_volume = float(data["Volume"].tail(20).mean())
+            avg_volume = float(
+                data["Volume"].tail(20).mean()
+            )
             volume_x = volume / avg_volume
             ma20 = float(
                 data["Close"].tail(20).mean()
             )
             score = 0
-            # Volume Score
+            # Volume
             if volume_x >= 5:
                 score += 40
             elif volume_x >= 3:
                 score += 30
             elif volume_x >= 2:
                 score += 20
-            # Momentum Score
+            # Momentum
             if change >= 10:
                 score += 30
             elif change >= 5:
                 score += 20
             elif change > 0:
                 score += 10
-            # Trend Score
+            # Trend
             if price > ma20:
                 score += 20
-            # Fundamentals
             fund = get_fundamentals(symbol)
             growth = fund["Growth"]
             quality = fund["Quality"]
             valuation = fund["Valuation"]
             sector = fund["Sector"]
+            revenue_growth = info.get(
+                "revenueGrowth", 0
+            )
+            if revenue_growth:
+                revenue_growth = round(
+                    revenue_growth * 100, 1
+                )
+            else:
+                revenue_growth = 0
+            pe = info.get("trailingPE", 0)
+            if pe is None:
+                pe = 0
+            ps = info.get("priceToSalesTrailing12Months", 0)
+            if ps is None:
+                ps = 0
             final_score = (
                 score +
                 growth +
                 quality +
                 valuation
             )
+            if final_score >= 75:
+                signal = "🚀 STRONG"
+            elif final_score >= 50:
+                signal = "👀 WATCH"
+            else:
+                signal = "⏳ WAIT"
+            hidden_gem = (
+                revenue_growth > 20
+                and final_score > 60
+                and volume_x > 2
+            )
             results.append([
                 symbol,
-                round(price, 2),
-                round(change, 2),
-                round(volume_x, 2),
-                growth,
-                quality,
-                valuation,
+                round(price,2),
+                round(change,2),
+                round(volume_x,2),
+                revenue_growth,
+                round(pe,1),
+                round(ps,1),
                 sector,
-                final_score
+                final_score,
+                signal,
+                hidden_gem
             ])
-        except Exception as e:
-            st.write(symbol, e)
+        except:
+            pass
     df = pd.DataFrame(
         results,
         columns=[
@@ -83,11 +148,13 @@ def scan_market():
             "Price",
             "% Change",
             "Volume x",
-            "Growth",
-            "Quality",
-            "Valuation",
+            "Revenue Growth %",
+            "P/E",
+            "P/S",
             "Sector",
-            "AI Score"
+            "AI Score",
+            "Signal",
+            "Hidden Gem"
         ]
     )
     return df.sort_values(
@@ -95,15 +162,29 @@ def scan_market():
         ascending=False
     )
 df = scan_market()
+# Filters
+df = df[df["AI Score"] >= min_score]
+if search_symbol:
+    df = df[
+        df["Symbol"].str.contains(
+            search_symbol
+        )
+    ]
+if only_hidden_gems:
+    df = df[df["Hidden Gem"] == True]
 st.subheader("🔥 AI Ranked Stocks")
-if df.empty:
-    st.warning("No data")
-else:
-    st.dataframe(
-        df,
-        use_container_width=True
-    )
+st.dataframe(
+    df,
+    use_container_width=True
+)
+csv = df.to_csv(index=False)
+st.download_button(
+    "📥 Download CSV",
+    csv,
+    "ai_stock_hunter.csv",
+    "text/csv"
+)
 st.caption(
-    "Last update: " +
+    "Updated: " +
     time.strftime("%H:%M:%S")
 )
