@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import time
+from streamlit_autorefresh import st_autorefresh
 from fundamentals import get_fundamentals
 st.set_page_config(
     page_title="AI Stock Hunter Pro",
@@ -30,6 +31,8 @@ refresh_button = st.sidebar.button("🔄 Refresh")
 # Title
 # =======================
 st.title("🚀 AI Stock Hunter Pro")
+# تحديث تلقائي كل دقيقة
+st_autorefresh(interval=60000, key="refresh")
 symbols = [
     # AI
     "NVDA","AMD","SMCI","ARM","AVGO",
