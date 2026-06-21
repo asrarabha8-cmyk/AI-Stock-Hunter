@@ -87,15 +87,25 @@ def scan_market():
             else:
                 signal = "⏳ WAIT"
 
+fund = get_fundamentals(symbol)
 
-            results.append([
-                symbol,
-                round(price,2),
-                round(change,2),
-                round(volume_x,2),
-                score,
-                signal
-            ])
+growth = fund["Growth"]
+quality = fund["Quality"]
+valuation = fund["Valuation"]
+sector = fund["Sector"]
+
+final_score = score + growth + quality + valuation
+          results.append([
+    symbol,
+    round(price,2),
+    round(change,2),
+    round(volume_x,2),
+    growth,
+    quality,
+    valuation,
+    sector,
+    final_score
+])
 
 
         except:
@@ -105,20 +115,23 @@ def scan_market():
     df = pd.DataFrame(
         results,
         columns=[
-            "Symbol",
-            "Price",
-            "% Change",
-            "Volume x",
-            "AI Score",
-            "Signal"
-        ]
+    "Symbol",
+    "Price",
+    "% Change",
+    "Volume x",
+    "Growth",
+    "Quality",
+    "Valuation",
+    "Sector",
+    "AI Score"
+]
     )
 
 
     return df.sort_values(
         "AI Score",
-        ascending=False
-    )
+ascending=False
+)
 
 
 
