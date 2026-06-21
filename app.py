@@ -104,17 +104,18 @@ def scan_market():
             )
             
                if final_score >= 75:
-                   signal = "🚀 STRONG"
-               elif final_score >= 50:
-                   signal = "👀 WATCH"
-               else:
-                   signal = "⏳ WAIT"
-                   hidden_gem = (
-                   revenue_growth > 20
-                   and final_score > 60
-                   and volume_x > 2
-                   and ps < 15
-            )
+    signal = "🚀 STRONG"
+elif final_score >= 50:
+    signal = "👀 WATCH"
+else:
+    signal = "⌛ WAIT"
+
+hidden_gem = (
+    revenue_growth > 20
+    and final_score > 60
+    and volume_x > 2
+    and ps < 15
+)
             results.append([
                 symbol,
                 round(price,2),
