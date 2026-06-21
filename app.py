@@ -86,8 +86,7 @@ def scan_market():
                 signal = "👀 WATCH"
             else:
                 signal = "⏳ WAIT"
-
-fund = get_fundamentals(symbol)
+                fund = get_fundamentals(symbol)
 
 growth = fund["Growth"]
 quality = fund["Quality"]
@@ -95,6 +94,8 @@ valuation = fund["Valuation"]
 sector = fund["Sector"]
 
 final_score = score + growth + quality + valuation
+
+
           results.append([
     symbol,
     round(price,2),
