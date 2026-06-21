@@ -102,6 +102,19 @@ def scan_market():
                 quality +
                 valuation
             )
+            # Hidden Value Bonus
+
+if revenue_growth > 30:
+    final_score += 10
+
+if revenue_growth > 50:
+    final_score += 10
+
+if ps < 10 and revenue_growth > 20:
+    final_score += 10
+
+if volume_x > 2:
+    final_score += 10
             if final_score >= 75:
                 signal = "🚀 STRONG"
             elif final_score >= 50:
