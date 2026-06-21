@@ -125,6 +125,7 @@ if volume_x > 2:
                 revenue_growth > 20
                 and final_score > 60
                 and volume_x > 2
+                and final_score > 60
             )
             results.append([
                 symbol,
