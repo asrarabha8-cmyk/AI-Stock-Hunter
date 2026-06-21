@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import time
+from fundamentals import get_fundamentals
 
 st.set_page_config(
     page_title="AI Stock Hunter",
