@@ -111,10 +111,9 @@ def scan_market():
                 signal = "⌛ WAIT"
 
             hidden_gem = (
-                revenue_growth > 20
-                and final_score > 60
-                and volume_x > 2
-                and ps < 15
+             revenue_growth > 20
+             and final_score > 60
+             and volume_x > 2
                 )
             results.append([
                 symbol,
